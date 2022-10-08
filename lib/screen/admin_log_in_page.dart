@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:u2/helper/custom_button.dart';
 import 'package:u2/helper/custom_text_form_fild.dart';
 import 'package:u2/screen/data_update.dart';
@@ -11,9 +13,11 @@ class LogInPage extends StatefulWidget {
   @override
   _LogInPageState createState() => _LogInPageState();
 }
+
 TextEditingController _emailController = TextEditingController();
 TextEditingController _passController = TextEditingController();
 final GlobalKey<FormState> _formKey = GlobalKey();
+final _auth = FirebaseAuth.instance;
 
 class _LogInPageState extends State<LogInPage> {
   @override
@@ -42,9 +46,7 @@ class _LogInPageState extends State<LogInPage> {
               SizedBox(height: 20,),
               InkWell(
                 onTap: (){
-                  if (_formKey.currentState!.validate())
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context)=>DataUpdate()));
+
                 },
                 child: CustomButton(
                     btnHight: AllSize.btnHight,
@@ -61,4 +63,18 @@ class _LogInPageState extends State<LogInPage> {
       ),
     );
   }
+}
+
+void singIn (String email, String password, context) async {
+  if (_formKey.currentState!.validate()){
+    await _auth.signInWithEmailAndPassword(email: email, password: password).then((value) => {
+      Fluttertoast.showToast(msg: "Login Successful!"),
+    Navigator.push(context,
+    MaterialPageRoute(builder: (context)=>DataUpdate()))
+    }).catchError((e){
+      Fluttertoast.showToast(msg: e.message);
+    });
+
+  }
+
 }
